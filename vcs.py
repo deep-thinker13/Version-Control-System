@@ -96,7 +96,8 @@ def repo(name):
 def change_branch():
     global curr_branch
     curr_branch = curr_repo.branches[request.form['branch']]
-    result = {'folders':[i.name for i in curr_branch.folders],'files':[i for i in curr_branch.files]}
+    folders = [i.name for i in curr_branch.folders] + [i for i in curr_branch.files]
+    result = {'folders':folders}
     return result
 
 
@@ -333,10 +334,18 @@ class Branch:
 
         modtime_epoch = os.path.getmtime(path)
         modificationTime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(modtime_epoch))
-        r = Folder(path, os.path.getsize(path), modificationTime)
-        self.folders.append(r)
+        to_remove = [i for i in self.folders if path == i.name.split("/")[0]]
+        if to_remove:
+            folder_path = "/" + self.owner + "/" + self.repo_name + "/" + self.branch_name + "/" + to_remove[0].name
+            print(folder_path)
+            client.files_delete(folder_path)
+        for i in to_remove:
+            self.folders.remove(i)
+        
         for root,d_names,f_names in os.walk(path):
             folder_path = "/" + self.owner + "/" + self.repo_name + "/" + self.branch_name + "/" + root.replace("\\","/")
+            r = Folder(root.replace("\\","/"), os.path.getsize(root.replace("\\","/")), modificationTime)
+            self.folders.append(r)
             client.files_create_folder(folder_path)
             for file in f_names:
                 if(file!=".DS_Store"): ## CONDITION NOT REQ FOR WINDOWS
@@ -344,7 +353,7 @@ class Branch:
                     modificationTime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(modtime_epoch))
                     a,type  = os.path.splitext(root.replace("\\","/")+"/"+file)
                     f = File(file,os.path.getsize(root.replace("\\","/")+"/"+file),0,modificationTime,type)
-                    self.files[file]=f
+                    self.files[root.replace("\\","/")+"/"+file]=f
                     client.files_upload(open(root.replace("\\","/")+"/"+file, "rb").read(),folder_path+"/"+file)
         '''for root,d_names,f_names in os.walk(path):
             folder_path = "/" + self.owner + "/" + self.repo_name + "/" + self.branch_name + "/" + root

@@ -1,6 +1,10 @@
 <html>
 <head>
 <style>
+body{
+  background-color: black;
+  text-decoration-color: white;
+}
 table {
   font-family: arial, sans-serif;
   border-collapse: collapse;
@@ -14,7 +18,7 @@ td, th {
 }
 
 tr:nth-child(even) {
-  background-color: #dddddd;
+  background-color: red;
 }
 .cancelbtn {
     position: relative;
@@ -28,10 +32,10 @@ tr:nth-child(even) {
 <body>
 <a href="{{ url_for('back') }}"> <button type="button" class="cancelbtn"> back </button></a>
 
-<h2>Version History</h2>
+<h2 style="color:white;">Version History</h2>
 
 
-<table>
+<table style="color:white;">
   <tr>
     {% for i in headers %}
     <th>{{i}}</th>

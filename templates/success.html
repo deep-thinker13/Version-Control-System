@@ -1,6 +1,8 @@
 <html>
     <style>
-    
+    body{
+      background-color: black;
+    }
     .registerbtn {
       background-color: #4CAF50;
       color: white;
@@ -42,13 +44,13 @@
 
     </style>
     <body>
-        <h1>Welcome {{username}} !!</h1>
+        <h1 style="color:white;">Welcome {{username}} !!</h1>
         <a href="{{ url_for('createrepo') }}"> <button type="button" class="registerbtn"> Create Repository</button></a>
         <a href="{{ url_for('home') }}"> <button type="button" class="registerbtn"> logout</button></a>
         <br><br>
-        <h2>Your repositories</h2>
+        <h2 style="color:white;">Your repositories</h2>
         <div id="repos"></div>
-        <h2>Your collaborations</h2>
+        <h2 style="color:white;">Your collaborations</h2>
         <div id = "collabs"></div>
         <script>
           var i;

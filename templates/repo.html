@@ -4,6 +4,29 @@
         //$("#select1").one("click",load_new_content);
         $("#select1").change(load_new_content());
     });
+    function contents(root, folders)
+    {
+      var fold = [];
+      var j;
+      var div = document.getElementById("contents");
+      $(div).empty()
+      for (j = 0; j < folders.length; j++) {
+        if(folders[j].indexOf('/')!=-1 && folders[j].substr(0,folders[j].indexOf('/')).localeCompare(root) == 0)
+        fold.push(folders[j].substr(folders[j].indexOf('/')+1));
+        }
+      for (j = 0; j < fold.length; j++){
+        if(fold[j].split("/").length ==1)
+        {
+          let folder = document.createElement("button");
+          folder.className = "repobtn";
+          folder.innerHTML = fold[j];
+          folder.onclick = function() {
+            contents(folder.innerHTML,fold);
+          };
+          div.appendChild(folder);
+        }
+      }
+    }
     function load_new_content(){
      var selected_option_value=$("#select1 option:selected").val();
      $.post("/change_branch", {branch: selected_option_value},
@@ -13,28 +36,25 @@
         var div = document.getElementById("contents");
         $(div).empty()
         for (i = 0; i < data.folders.length; i++) {
-        var button = document.createElement("button");
-        button.className = "repobtn"
-        button.innerHTML = data.folders[i];
-        div.appendChild(button);
-        button.addEventListener ("click", function() {
-            location.href = 'http://localhost:5000/folder/'+button.innerHTML;
-        });
+        if(data.folders[i].split("/").length == 1)
+        {
+          let button = document.createElement("button");
+          button.className = "repobtn"
+          button.innerHTML = data.folders[i];
+          div.appendChild(button);
+          button.addEventListener ("click", function() {
+              contents(button.innerHTML,data.folders);
+          });
         }
-        for (i = 0; i < data.files.length; i++) {
-        var button = document.createElement("button");
-        button.className = "repobtn"
-        button.innerHTML = data.files[i];
-        div.appendChild(button);
-        button.addEventListener ("click", function() {
-            location.href = 'http://localhost:5000/file/'+button.innerHTML;
-        });
         }
     });
     }
   </script>
   </head>
     <style>
+    body{
+      background-color: black;
+    }
     .registerbtn {
       background-color: #4CAF50;
       color: white;
@@ -84,7 +104,7 @@
     <body>
         <br><br>
         <select name="select1" id="select1" onchange='load_new_content()'>
-            <option value="dummy">dummy</option>
+            <option value="dummy">change branch</option>
         {% for i in branches %}
             <option value="{{i}}">{{i}}</option>
         {% endfor %}
@@ -93,13 +113,14 @@
         <a href="{{ url_for('pull') }}"> <button type="button" class="cancelbtn"> Pull </button></a>
         <a href="{{ url_for('afterclone') }}"> <button type="button" class="cancelbtn"> clone </button></a>
         <a href="{{ url_for('version') }}"> <button type="button" class="cancelbtn"> Version history </button></a>
-        <a href="{{ url_for('homecoming') }}"> <button type="button" class="cancelbtn"> back </button></a>
+        <a href="{{ url_for('homecoming') }}"> <button type="button" class="cancelbtn"> Back </button></a>
+        <a href="{{ url_for('back') }}"> <button type="button" class="cancelbtn"> Reset </button></a>
 
 
 
 
 
-        <h2>Your contents:</h2>
+        <h2 style="color:white;">Your contents:</h2>
         <div id="contents"></div>
         <script></script>
         <script type=text/javascript src="{{
